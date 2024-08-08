@@ -31,11 +31,13 @@ func main() {
 	// infobae
 	collector.OnHTML(".three-elements-chain", func(e *colly.HTMLElement) {
 		e.ForEach(".story-card-info", func(_ int, e *colly.HTMLElement) {
-			article := Article{}
-			article.Title = e.ChildText(".story-card-hl")
-			article.Url = e.ChildAttr("a", "href")
-			fmt.Println(article.Title)
-			fmt.Println(urlInfobae + article.Url)
+			if e.ChildText(".story-card-hl") != "" {
+				article := Article{}
+				article.Title = e.ChildText(".story-card-hl")
+				article.Url = e.ChildAttr(".headline-link", "href")
+				fmt.Println(article.Title)
+				fmt.Println(urlInfobae + article.Url)
+			}
 		})
 	})
 
