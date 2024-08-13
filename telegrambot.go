@@ -34,7 +34,7 @@ func (t *TelegramBot) CreateBotIntance() *tgbotapi.BotAPI {
 }
 
 func (t *TelegramBot) sendMessage(article Article, bot *tgbotapi.BotAPI) {
-	msg := tgbotapi.NewMessageToChannel(goDotEnvVariable("BOT_ID"), article.feed+"\n\n"+article.title+"\n\n"+"<a href='"+article.url+"'>Link</a>")
+	msg := tgbotapi.NewMessageToChannel(goDotEnvVariable("CHANNEL_ID"), article.feed+"\n\n"+article.title+"\n\n"+"<a href='"+article.url+"'>Link</a>")
 	msg.ParseMode = "HTML"
 	msg.DisableWebPagePreview = true
 	bot.Send(msg)
