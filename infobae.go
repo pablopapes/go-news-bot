@@ -13,6 +13,7 @@ type Infobae struct {
 
 func (i *Infobae) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotapi.BotAPI) {
 	collector := colly.NewCollector()
+	database := &db{}
 	collector.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL)
 	})
@@ -28,9 +29,14 @@ func (i *Infobae) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotap
 				article := Article{}
 				article.title = e.ChildText(".story-card-hl")
 				article.url = i.url + e.ChildAttr(".headline-link", "href")
+				article.feed = "🟡 Infobae"
 				fmt.Println(article.title)
 				fmt.Println(article.url)
-				telegramIntance.sendMessage(article, telegramBot)
+
+				if !database.checkData(article) {
+					telegramIntance.sendMessage(article, telegramBot)
+					database.saveData(article)
+				}
 			}
 		})
 	})

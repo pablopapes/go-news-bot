@@ -14,6 +14,7 @@ type LaNacion struct {
 func (l *LaNacion) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotapi.BotAPI) {
 
 	collector := colly.NewCollector()
+	database := &db{}
 	collector.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL)
 	})
@@ -28,9 +29,13 @@ func (l *LaNacion) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbota
 			article := Article{}
 			article.title = e.ChildText(".title")
 			article.url = l.url + e.ChildAttr("section", "href")
+			article.feed = "🔵 La Nación"
 			fmt.Println(article.title)
 			fmt.Println(article.url)
-			telegramIntance.sendMessage(article, telegramBot)
+			if !database.checkData(article) {
+				telegramIntance.sendMessage(article, telegramBot)
+				database.saveData(article)
+			}
 		})
 	})
 	collector.Visit(l.url)

@@ -14,6 +14,7 @@ type Clarin struct {
 func (l *Clarin) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotapi.BotAPI) {
 
 	collector := colly.NewCollector()
+	database := &db{}
 	collector.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL)
 	})
@@ -29,9 +30,13 @@ func (l *Clarin) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotapi
 				article := Article{}
 				article.title = e.ChildText(".title")
 				article.url = e.ChildAttr("a", "href")
+				article.feed = "🔴 Clarin"
 				fmt.Println(article.title)
 				fmt.Println(article.url)
-				telegramIntance.sendMessage(article, telegramBot)
+				if !database.checkData(article) {
+					telegramIntance.sendMessage(article, telegramBot)
+					database.saveData(article)
+				}
 			}
 		})
 	})

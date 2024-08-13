@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
@@ -33,9 +34,10 @@ func (t *TelegramBot) CreateBotIntance() *tgbotapi.BotAPI {
 }
 
 func (t *TelegramBot) sendMessage(article Article, bot *tgbotapi.BotAPI) {
-	msg := tgbotapi.NewMessageToChannel("@news_argy", article.title+"\n\n"+"👉 <a href='"+article.url+"'>Link</a>")
+	msg := tgbotapi.NewMessageToChannel("@news_argy", article.feed+"\n\n"+article.title+"\n\n"+"<a href='"+article.url+"'>Link</a>")
 	msg.ParseMode = "HTML"
 	msg.DisableWebPagePreview = true
 	bot.Send(msg)
-
+	fmt.Println("Waiting 10 seconds to start the next message")
+	time.Sleep(10 * time.Second)
 }
