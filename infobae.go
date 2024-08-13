@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gocolly/colly"
 )
 
@@ -10,7 +11,7 @@ type Infobae struct {
 	url string
 }
 
-func (i *Infobae) CollectNews() {
+func (i *Infobae) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotapi.BotAPI) {
 	collector := colly.NewCollector()
 	collector.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL)
@@ -26,17 +27,10 @@ func (i *Infobae) CollectNews() {
 			if e.ChildText(".story-card-hl") != "" {
 				article := Article{}
 				article.title = e.ChildText(".story-card-hl")
-				article.url = e.ChildAttr(".headline-link", "href")
+				article.url = i.url + e.ChildAttr(".headline-link", "href")
 				fmt.Println(article.title)
-				fmt.Println(i.url + article.url)
-
-				/*
-					msg := tgbotapi.NewMessageToChannel("@news_argy", article.Title+"\n"+"👉 <a href='"+urlInfobae+article.Url+"'>Link a infobae</a>")
-					msg.ParseMode = "HTML"
-					msg.DisableWebPagePreview = true
-					bot.Send(msg)
-				*/
-
+				fmt.Println(article.url)
+				telegramIntance.sendMessage(article, telegramBot)
 			}
 		})
 	})

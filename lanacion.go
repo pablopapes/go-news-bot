@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gocolly/colly"
 )
 
@@ -10,7 +11,7 @@ type LaNacion struct {
 	url string
 }
 
-func (l *LaNacion) CollectNews() {
+func (l *LaNacion) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotapi.BotAPI) {
 
 	collector := colly.NewCollector()
 	collector.OnRequest(func(r *colly.Request) {
@@ -26,15 +27,10 @@ func (l *LaNacion) CollectNews() {
 		e.ForEach(".ln-card", func(_ int, e *colly.HTMLElement) {
 			article := Article{}
 			article.title = e.ChildText(".title")
-			article.url = e.ChildAttr("section", "href")
+			article.url = l.url + e.ChildAttr("section", "href")
 			fmt.Println(article.title)
-			fmt.Println(l.url + article.url)
-			/*
-				msg := tgbotapi.NewMessageToChannel("@news_argy", article.title+"\n"+"👉 <a href='"+l.url+article.url+"'>Link a La Nación</a>")
-				msg.ParseMode = "HTML"
-				msg.DisableWebPagePreview = true
-				bot.Send(msg)
-			*/
+			fmt.Println(article.url)
+			telegramIntance.sendMessage(article, telegramBot)
 		})
 	})
 	collector.Visit(l.url)

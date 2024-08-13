@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gocolly/colly"
 )
 
@@ -10,7 +11,7 @@ type Clarin struct {
 	url string
 }
 
-func (l *Clarin) CollectNews() {
+func (l *Clarin) CollectNews(telegramIntance *TelegramBot, telegramBot *tgbotapi.BotAPI) {
 
 	collector := colly.NewCollector()
 	collector.OnRequest(func(r *colly.Request) {
@@ -30,12 +31,7 @@ func (l *Clarin) CollectNews() {
 				article.url = e.ChildAttr("a", "href")
 				fmt.Println(article.title)
 				fmt.Println(article.url)
-				/*
-					msg := tgbotapi.NewMessageToChannel("@news_argy", article.title+"\n"+"👉 <a href='"+l.url+article.url+"'>Link a La Nación</a>")
-					msg.ParseMode = "HTML"
-					msg.DisableWebPagePreview = true
-					bot.Send(msg)
-				*/
+				telegramIntance.sendMessage(article, telegramBot)
 			}
 		})
 	})
